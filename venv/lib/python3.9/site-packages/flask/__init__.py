@@ -6,11 +6,11 @@
     A microframework based on Werkzeug.  It's extensively documented
     and follows best practice patterns.
 
-    :copyright: © 2010 by the Pallets team.
-    :license: BSD, see LICENSE for more details.
+    :copyright: 2010 Pallets
+    :license: BSD-3-Clause
 """
 
-__version__ = '1.0.2'
+__version__ = '1.0.4'
 
 # utilities we import from Werkzeug and Jinja2 that are unused
 # in the module but are exported as public interface.

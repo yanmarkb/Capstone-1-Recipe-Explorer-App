@@ -1,21 +1,46 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Register</h1>
-    <form method="POST" action="{{ url_for('register') }}">
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.username.label }}<br>
-            {{ form.username(size=30) }}
-        </p>
-        <p>
-            {{ form.email.label }}<br>
-            {{ form.email(size=30) }}
-        </p>
-        <p>
-            {{ form.password.label }}<br>
-            {{ form.password(size=30) }}
-        </p>
-        <p>{{ form.submit() }}</p>
-    </form>
+    {% if g.user is none %}
+        <h1>Register</h1>
+        <form method="POST" action="{{ url_for('register') }}">
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.username.label }}<br>
+                {{ form.username(size=30) }}
+            </p>
+            <p>
+                {{ form.email.label }}<br>
+                {{ form.email(size=30) }}
+            </p>
+            <p>
+                {{ form.password.label }}<br>
+                {{ form.password(size=30) }}
+            </p>
+            <p>
+                {{ form.confirm_password.label }}<br>
+                {{ form.confirm_password(size=30) }}
+            </p>
+            <p>
+                {{ form.image_url.label }}<br>
+                {{ form.image_url(size=30) }}
+            </p>
+            <p>
+                {{ form.header_image_url.label }}<br>
+                {{ form.header_image_url(size=30) }}
+            </p>
+            <p>
+                {{ form.bio.label }}<br>
+                {{ form.bio(size=30) }}
+            </p>
+            <p>
+                {{ form.location.label }}<br>
+                {{ form.location(size=30) }}
+            </p>
+            <p>{{ form.submit() }}</p>
+        </form>
+    {% else %}
+        <!-- User is logged in, so don't display the form -->
+        <h1>Welcome, {{ g.user.username }}!</h1>
+    {% endif %}
 {% endblock %}

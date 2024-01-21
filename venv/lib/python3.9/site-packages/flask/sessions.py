@@ -5,23 +5,23 @@
 
     Implements cookie based sessions based on itsdangerous.
 
-    :copyright: © 2010 by the Pallets team.
-    :license: BSD, see LICENSE for more details.
+    :copyright: 2010 Pallets
+    :license: BSD-3-Clause
 """
 
 import hashlib
 import warnings
-from collections import MutableMapping
 from datetime import datetime
 
 from itsdangerous import BadSignature, URLSafeTimedSerializer
 from werkzeug.datastructures import CallbackDict
 
+from flask._compat import collections_abc
 from flask.helpers import is_ip, total_seconds
 from flask.json.tag import TaggedJSONSerializer
 
 
-class SessionMixin(MutableMapping):
+class SessionMixin(collections_abc.MutableMapping):
     """Expands a basic dictionary with session attributes."""
 
     @property

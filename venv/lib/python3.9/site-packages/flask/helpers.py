@@ -5,8 +5,8 @@
 
     Implements various helpers.
 
-    :copyright: © 2010 by the Pallets team.
-    :license: BSD, see LICENSE for more details.
+    :copyright: 2010 Pallets
+    :license: BSD-3-Clause
 """
 
 import os
@@ -276,7 +276,7 @@ def url_for(endpoint, **values):
     :param values: the variable arguments of the URL rule
     :param _external: if set to ``True``, an absolute URL is generated. Server
       address can be changed via ``SERVER_NAME`` configuration variable which
-      defaults to `localhost`.
+      falls back to the `Host` header, then to the IP and port of the request.
     :param _scheme: a string specifying the desired URL scheme. The `_external`
       parameter must be set to ``True`` or a :exc:`ValueError` is raised. The default
       behavior uses the same scheme as the current request, or
@@ -506,6 +506,10 @@ def send_file(filename_or_fp, mimetype=None, as_attachment=False,
 
     .. _RFC 2231: https://tools.ietf.org/html/rfc2231#section-4
 
+    .. versionchanged:: 1.0.3
+        Filenames are encoded with ASCII instead of Latin-1 for broader
+        compatibility with WSGI servers.
+
     :param filename_or_fp: the filename of the file to send.
                            This is relative to the :attr:`~Flask.root_path`
                            if a relative path is specified.
@@ -563,13 +567,16 @@ def send_file(filename_or_fp, mimetype=None, as_attachment=False,
             raise TypeError('filename unavailable, required for '
                             'sending as attachment')
 
+        if not isinstance(attachment_filename, text_type):
+            attachment_filename = attachment_filename.decode('utf-8')
+
         try:
-            attachment_filename = attachment_filename.encode('latin-1')
+            attachment_filename = attachment_filename.encode('ascii')
         except UnicodeEncodeError:
             filenames = {
                 'filename': unicodedata.normalize(
-                    'NFKD', attachment_filename).encode('latin-1', 'ignore'),
-                'filename*': "UTF-8''%s" % url_quote(attachment_filename),
+                    'NFKD', attachment_filename).encode('ascii', 'ignore'),
+                'filename*': "UTF-8''%s" % url_quote(attachment_filename, safe=b""),
             }
         else:
             filenames = {'filename': attachment_filename}
@@ -782,19 +789,38 @@ def _matching_loader_thinks_module_is_package(loader, mod_name):
         loader.__class__.__name__)
 
 
-def find_package(import_name):
-    """Finds a package and returns the prefix (or None if the package is
-    not installed) as well as the folder that contains the package or
-    module as a tuple.  The package path returned is the module that would
-    have to be added to the pythonpath in order to make it possible to
-    import the module.  The prefix is the path below which a UNIX like
-    folder structure exists (lib, share etc.).
-    """
-    root_mod_name = import_name.split('.')[0]
+def _find_package_path(root_mod_name):
+    """Find the path where the module's root exists in"""
+    if sys.version_info >= (3, 4):
+        import importlib.util
+
+        try:
+            spec = importlib.util.find_spec(root_mod_name)
+            if spec is None:
+                raise ValueError("not found")
+        # ImportError: the machinery told us it does not exist
+        # ValueError:
+        #    - the module name was invalid
+        #    - the module name is __main__
+        #    - *we* raised `ValueError` due to `spec` being `None`
+        except (ImportError, ValueError):
+            pass  # handled below
+        else:
+            # namespace package
+            if spec.origin in {"namespace", None}:
+                return os.path.dirname(next(iter(spec.submodule_search_locations)))
+            # a package (with __init__.py)
+            elif spec.submodule_search_locations:
+                return os.path.dirname(os.path.dirname(spec.origin))
+            # just a normal module
+            else:
+                return os.path.dirname(spec.origin)
+
+    # we were unable to find the `package_path` using PEP 451 loaders
     loader = pkgutil.get_loader(root_mod_name)
-    if loader is None or import_name == '__main__':
+    if loader is None or root_mod_name == '__main__':
         # import name is not found, or interactive/main module
-        package_path = os.getcwd()
+        return os.getcwd()
     else:
         # For .egg, zipimporter does not have get_filename until Python 2.7.
         if hasattr(loader, 'get_filename'):
@@ -808,17 +834,29 @@ def find_package(import_name):
             # Google App Engine's HardenedModulesHook
             #
             # Fall back to imports.
-            __import__(import_name)
-            filename = sys.modules[import_name].__file__
+            __import__(root_mod_name)
+            filename = sys.modules[root_mod_name].__file__
         package_path = os.path.abspath(os.path.dirname(filename))
 
         # In case the root module is a package we need to chop of the
         # rightmost part.  This needs to go through a helper function
         # because of python 3.3 namespace packages.
-        if _matching_loader_thinks_module_is_package(
-                loader, root_mod_name):
+        if _matching_loader_thinks_module_is_package(loader, root_mod_name):
             package_path = os.path.dirname(package_path)
 
+    return package_path
+
+
+def find_package(import_name):
+    """Finds a package and returns the prefix (or None if the package is
+    not installed) as well as the folder that contains the package or
+    module as a tuple.  The package path returned is the module that would
+    have to be added to the pythonpath in order to make it possible to
+    import the module.  The prefix is the path below which a UNIX like
+    folder structure exists (lib, share etc.).
+    """
+    root_mod_name, _, _ = import_name.partition('.')
+    package_path = _find_package_path(root_mod_name)
     site_parent, site_folder = os.path.split(package_path)
     py_prefix = os.path.abspath(sys.prefix)
     if package_path.startswith(py_prefix):

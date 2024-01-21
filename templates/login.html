@@ -1,17 +1,21 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Login</h1>
-    <form method="POST" action="{{ url_for('login') }}">
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.username.label }}<br>
-            {{ form.username(size=30) }}
-        </p>
-        <p>
-            {{ form.password.label }}<br>
-            {{ form.password(size=30) }}
-        </p>
-        <p>{{ form.submit() }}</p>
-    </form>
+    {% if g.user is none %}
+        <h1>Login</h1>
+        <form method="POST" action="{{ url_for('login') }}">
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.username.label }}<br>
+                {{ form.username(size=30) }}
+            </p>
+            <p>
+                {{ form.password.label }}<br>
+                {{ form.password(size=30) }}
+            </p>
+            <p>{{ form.submit() }}</p>
+        </form>
+    {% else %}
+        <h1>Welcome, {{ g.user.username }}!</h1>
+    {% endif %}
 {% endblock %}

@@ -6,8 +6,8 @@
     Implements test support helpers.  This module is lazily imported
     and usually not used in production environments.
 
-    :copyright: © 2010 by the Pallets team.
-    :license: BSD, see LICENSE for more details.
+    :copyright: 2010 Pallets
+    :license: BSD-3-Clause
 """
 
 import werkzeug
@@ -73,14 +73,10 @@ def make_test_environ_builder(
             sep = b'?' if isinstance(url.query, bytes) else '?'
             path += sep + url.query
 
+    # TODO use EnvironBuilder.json_dumps once we require Werkzeug 0.15
     if 'json' in kwargs:
-        assert 'data' not in kwargs, (
-            "Client cannot provide both 'json' and 'data'."
-        )
-
-        # push a context so flask.json can use app's json attributes
-        with app.app_context():
-            kwargs['data'] = json_dumps(kwargs.pop('json'))
+        assert 'data' not in kwargs, "Client cannot provide both 'json' and 'data'."
+        kwargs['data'] = json_dumps(kwargs.pop('json'), app=app)
 
         if 'content_type' not in kwargs:
             kwargs['content_type'] = 'application/json'

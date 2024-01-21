@@ -5,6 +5,15 @@ from flask import current_app
 
 from alembic import context
 
+# add your project directory to the sys.path
+import os
+import sys
+project_dir = "/Users/yanmarkberube/Documents/yberubeCode/Capstone1"
+sys.path.append(project_dir)
+
+# import your models here
+from models import User, Recipe, Ingredient, RecipeIngredient, UserRecipe, SavedRecipe  # noqa
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -13,7 +22,6 @@ config = context.config
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
 logger = logging.getLogger('alembic.env')
-
 
 def get_engine():
     try:

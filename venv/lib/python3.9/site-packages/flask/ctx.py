@@ -5,8 +5,8 @@
 
     Implements the objects required to keep the context.
 
-    :copyright: © 2010 by the Pallets team.
-    :license: BSD, see LICENSE for more details.
+    :copyright: 2010 Pallets
+    :license: BSD-3-Clause
 """
 
 import sys
@@ -170,7 +170,7 @@ def has_request_context():
                 self.remote_addr = remote_addr
 
     Alternatively you can also just test any of the context bound objects
-    (such as :class:`request` or :class:`g` for truthness)::
+    (such as :class:`request` or :class:`g`) for truthness::
 
         class User(db.Model):
 

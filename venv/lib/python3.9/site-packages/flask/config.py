@@ -5,8 +5,8 @@
 
     Implements the configuration related objects.
 
-    :copyright: © 2010 by the Pallets team.
-    :license: BSD, see LICENSE for more details.
+    :copyright: 2010 Pallets
+    :license: BSD-3-Clause
 """
 
 import os
@@ -155,6 +155,10 @@ class Config(dict):
             app.config.from_object('yourapplication.default_config')
             from yourapplication import default_config
             app.config.from_object(default_config)
+
+        Nothing is done to the object before loading. If the object is a
+        class and has ``@property`` attributes, it needs to be
+        instantiated before being passed to this method.
 
         You should not use this function to load the actual configuration but
         rather configuration defaults.  The actual config should be loaded
