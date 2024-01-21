@@ -9,6 +9,7 @@ from flask_migrate import Migrate
 from models import connect_db, db, User, Recipe, Ingredient, RecipeIngredient, UserRecipe, SavedRecipe
 from forms import LoginForm, RegistrationForm
 from flask_bcrypt import Bcrypt
+import random
 
 CURR_USER_KEY = "curr_user"
 
@@ -73,7 +74,8 @@ def home():
     if g.user is None:
         return redirect(url_for('login'))
 
-    meals = []
+    meals = session.pop('meals', [])  # get and remove the meals from session
+
     if request.method == 'POST':
         main_ingredient = request.form.get('main_ingredient')
         extra_ingredients = request.form.get('extra_ingredients').split(',')
@@ -85,14 +87,48 @@ def home():
             response = requests.get(f'https://www.themealdb.com/api/json/v1/1/filter.php?i={ingredient}')
             meals += response.json().get('meals', [])
 
+    # Select 3 random meals if there are more than 3 meals
+    if len(meals) > 3:
+        meals = random.sample(meals, 3)
+
     return render_template('index.html', meals=meals)
 
-@app.route('/meal/<id>')
+    return render_template('index.html', meals=meals)
+
+@app.route('/meal/<id>', methods=['GET', 'POST'])
 @login_required
 def meal(id):
+    if request.method == 'POST':
+        search_query = request.form.get('search')
+        response = requests.get(f'https://www.themealdb.com/api/json/v1/1/search.php?s={search_query}')
+        meals = response.json().get('meals', [])
+        if meals:
+            session['meals'] = meals 
+            return redirect(url_for('home'))
+
     response = requests.get(f'https://www.themealdb.com/api/json/v1/1/lookup.php?i={id}')
     meal = response.json().get('meals', [])[0]
     return render_template('meal.html', meal=meal)
+
+@app.route('/search', methods=['POST'])
+@login_required
+def search():
+    main_ingredient = request.form.get('main_ingredient')
+    extra_ingredients = request.form.get('extra_ingredients').split(',')
+
+    # Get meals with the main ingredient
+    response = requests.get(f'https://www.themealdb.com/api/json/v1/1/filter.php?i={main_ingredient}')
+    meals = response.json().get('meals', [])
+
+    # Filter meals that contain all extra ingredients
+    for ingredient in extra_ingredients:
+        response = requests.get(f'https://www.themealdb.com/api/json/v1/1/filter.php?i={ingredient.strip()}')
+        ingredient_meals = response.json().get('meals', [])
+        meals = [meal for meal in meals if meal in ingredient_meals]
+
+    if meals:
+        session['meals'] = meals  # store the meals in session
+    return redirect(url_for('home'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -114,6 +150,7 @@ def register():
         return redirect("/")
     else:
         return render_template('register.html', form=form)
+        
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """Handle user login."""
@@ -155,7 +192,7 @@ def list_users():
         users = User.query.all()
     else:
         users = User.query.filter(User.username.like(f"%{search}%")).all()
-    return render_template('users/index.html', users=users)
+    return render_template('index.html', users=users)
 
 if __name__ == '__main__':
     app = create_app()

@@ -15,13 +15,13 @@
 <body>
     <nav>
         <a href="{{ url_for('home') }}">Home</a>
-        {% if session[CURR_USER_KEY] %}
+        {% if g.user %}
             <a href="{{ url_for('logout') }}">Logout</a>
         {% else %}
             <a href="{{ url_for('login') }}">Login</a>
             <a href="{{ url_for('register') }}">Register</a>
         {% endif %}
-        <form class="input-container" method="POST">
+        <form class="input-container" method="POST" action="{{ url_for('search') }}">
             <input type="text" name="main_ingredient" class="text input" placeholder="Main Ingredient">
             <input type="text" name="extra_ingredients" class="text input" placeholder="Extra Ingredients (comma separated)">
             <button type="submit"><i class="fas fa-search magnifier"></i></button>
