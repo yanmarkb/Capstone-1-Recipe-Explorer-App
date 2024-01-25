@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-6 col-md-8 col-sm-12">
+            <h1>{{ user.username }}'s favorited meals</h1>
+            <ul class="list-group" id="meals">
+                {% for meal in meals %}
+                    <div>
+                        <h2>{{ meal.title }}</h2>
+                    </div>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}

@@ -14,62 +14,21 @@ bcrypt = Bcrypt()
 # Initialize the SQLAlchemy extension for interacting with the database.
 db = SQLAlchemy()
 
-# class User(db.Model):
-#     """User in the system."""
-#     __tablename__ = 'users'
+class Favorite(db.Model):
+    """Favorite in the system."""
 
-#     id = db.Column(db.Integer, primary_key=True)
-#     username = db.Column(db.String(20), unique=True, nullable=False)
-#     email = db.Column(db.String(120), unique=True, nullable=False)
-#     password_hash = db.Column(db.String(60), nullable=False)
-#     recipes = db.relationship('Recipe', backref='author', lazy=True)
+    __tablename__ = 'favorites'
 
-#     def check_password(self, password):
-#         return bcrypt.check_password_hash(self.password_hash, password)
+    id = db.Column(db.Integer, primary_key=True)
 
-#     @classmethod
-#     def signup(cls, username, email, password, image_url):
-#         hashed_pwd = bcrypt.generate_password_hash(password).decode('UTF-8')
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.id'))
 
-#         user = User(
-#             username=username,
-#             email=email,
-#             password_hash=hashed_pwd,
-#             image_url=image_url,
-#         )
+    __table_args__ = (db.UniqueConstraint('user_id', 'recipe_id', name='user_recipe_uc'),)
 
-#         db.session.add(user)
-#         db.session.commit()  
-#         return user
+    user = db.relationship('User', backref=db.backref('favorites', cascade='all, delete-orphan'))
+    recipe = db.relationship('Recipe', backref=db.backref('favorited_by_users', cascade='all, delete-orphan'))
 
-#     @classmethod
-#     def authenticate(cls, username, password):
-#         user = cls.query.filter_by(username=username).first()
-
-#         if user:
-#             is_auth = bcrypt.check_password_hash(user.password_hash, password)
-#             if is_auth:
-#                 return user
-
-#         return False
-
-#     @property
-#     def password(self):
-#         """Password property."""
-#         raise AttributeError('Password is not a readable attribute.')
-
-#     @password.setter
-#     def password(self, password):
-#         """Set password property."""
-#         self.password_hash = generate_password_hash(password)
-
-#     def verify_password(self, password):
-#         """Check if password is correct."""
-#         return check_password_hash(self.password_hash, password)
-
-#     @classmethod
-#     def logout(cls):
-#         session.clear()
 
 class User(db.Model):
     """User in the system."""
@@ -124,6 +83,8 @@ class User(db.Model):
         db.Text,
         nullable=False,
     )
+
+    favorite_recipes = db.relationship('Recipe', secondary='favorites' , backref='favorited_by_user')
 
     def __repr__(self):
         return f"<User #{self.id}: {self.username}, {self.email}>"
@@ -182,10 +143,11 @@ class Recipe(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
-    main_ingredient = db.Column(db.String(100), nullable=False)
+    main_ingredient = db.Column(db.String(100), nullable=True)
     additional_ingredients = db.Column(db.String(300), nullable=True)
-    instructions = db.Column(db.Text, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    instructions = db.Column(db.Text, nullable=True)
+
+    favorited_by = db.relationship('Favorite', backref='favorited_recipe')
     ingredients = db.relationship('RecipeIngredient', backref='recipe', lazy=True)
 
 class Ingredient(db.Model):
@@ -209,6 +171,8 @@ class UserRecipe(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
     recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.id'), primary_key=True)
+
+
 
 class SavedRecipe(db.Model):
     __tablename__ = 'saved_recipes'
