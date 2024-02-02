@@ -10,11 +10,11 @@ class RegistrationForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
 
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Sign Up')
+    submit = SubmitField('Sign Up', render_kw={"class": "hide-for-edit"})
 
     # Add optional string fields for the image URL, header image URL, bio, and location.
     image_url = StringField('(Optional) Image URL')
-    header_image_url = StringField('(Optional) Header Image URL')
+    header_image = StringField('(Optional) Header Image', render_kw={"class": "hide-for-edit"})
     bio = StringField('(Optional) Bio')
     location = StringField('(Optional) Location')
 

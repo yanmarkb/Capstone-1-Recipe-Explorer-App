@@ -161,42 +161,49 @@ def meal(id):
     return render_template('meal.html', meal=meal)
 
 def search_meals(main_ingredient, extra_ingredients):
-    
+    # Send requests to the APIs
     filter_url = f"https://www.themealdb.com/api/json/v1/1/filter.php?i={main_ingredient}"
     search_main_url = f"https://www.themealdb.com/api/json/v1/1/search.php?s={main_ingredient}"
     filter_response = requests.get(filter_url).json()
     search_main_response = requests.get(search_main_url).json()
 
-    
+    # Get the meals from the responses
     filter_meals = filter_response.get('meals')
     search_main_meals = search_main_response.get('meals')
 
-
+    # If the meals are None, replace them with an empty list
     if filter_meals is None:
         filter_meals = []
     if search_main_meals is None:
         search_main_meals = []
 
-   
+    # If there are no meals in both responses, return an empty list
     if not filter_meals and not search_main_meals:
         return []
 
-
+    # Combine meals from both responses
     all_meals = filter_meals + search_main_meals
 
-    for extra_ingredient in extra_ingredients:
-        search_extra_url = f"https://www.themealdb.com/api/json/v1/1/filter.php?i={extra_ingredient}"
-        search_extra_response = requests.get(search_extra_url).json()
-        search_extra_meals = search_extra_response.get('meals')
-        if search_extra_meals is None:
-            search_extra_meals = []
-        if not search_extra_meals:
-            return []
-        all_meals += search_extra_meals
+    # If extra_ingredients is not empty, filter meals based on extra ingredients
+    if extra_ingredients:
+        for meal in all_meals:
+            meal_id = meal['idMeal']
+            lookup_url = f"https://www.themealdb.com/api/json/v1/1/lookup.php?i={meal_id}"
+            lookup_response = requests.get(lookup_url).json()
+            lookup_meal = lookup_response.get('meals', [])[0]
+            for ingredient in extra_ingredients:
+                if ingredient not in lookup_meal.values():
+                    all_meals.remove(meal)
+                    break
 
-    unique_meals = {meal['idMeal']: meal for meal in all_meals}.values()
+    # Remove duplicates
+    unique_meals = list({meal['idMeal']: meal for meal in all_meals}.values())
 
-    return list(unique_meals)
+    # If there are more than 3 meals, select 3 random ones
+    if len(unique_meals) > 3:
+        unique_meals = random.sample(unique_meals, 3)
+
+    return unique_meals
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
@@ -302,9 +309,31 @@ def users_show(user_id):
     recipes = (Recipe
                 .query
                 .filter(Recipe.user_id == user_id)
-                .order_by(Recipe.created_at.desc())
                 .all())
-    return render_template('users/show.html', user=user, recipes=recipes)
+    form = RegistrationForm(obj=user)  # Create form with user data
+    return render_template('users/show.html', user=user, recipes=recipes, form=form)
+
+@app.route('/users/profile', methods=["GET", "POST"])
+@login_required
+def profile():
+    """Update profile for current user."""
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+    user = User.query.get_or_404(g.user.id)
+    form = RegistrationForm(obj=user)
+    if form.validate_on_submit():
+        if User.authenticate(user.username, form.password.data):
+            user.username = form.username.data
+            user.email = form.email.data
+            user.image_url = form.image_url.data or user.image_url
+            user.bio = form.bio.data
+            user.location = form.location.data
+            db.session.commit()
+            return redirect(f"/users/{user.id}")
+        else:
+            flash("Invalid password, please try again.", "danger")
+    return render_template("users/edit.html", form=form, user=user)
 
 if __name__ == '__main__':
     app.run(debug=True)

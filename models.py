@@ -150,6 +150,7 @@ class Recipe(db.Model):
     main_ingredient = db.Column(db.String(100), nullable=True)
     additional_ingredients = db.Column(db.String(300), nullable=True)
     instructions = db.Column(db.Text, nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     favorited_by = db.relationship('Favorite', backref='favorited_recipe')
     ingredients = db.relationship('RecipeIngredient', backref='recipe', lazy=True)
