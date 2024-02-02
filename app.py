@@ -1,12 +1,14 @@
 import os
 import requests
+import random
 from functools import wraps
 from flask import Flask, render_template, request, flash, redirect, session, g, url_for
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 import pdb
+from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from models import connect_db, db, User, Recipe, Ingredient, RecipeIngredient, UserRecipe, SavedRecipe, Favorite
+from models import connect_db, db, migrate, User, Recipe, Ingredient, RecipeIngredient, UserRecipe, SavedRecipe, Favorite
 from forms import LoginForm, RegistrationForm
 from flask_bcrypt import Bcrypt
 import random
@@ -14,7 +16,7 @@ import random
 CURR_USER_KEY = "curr_user"
 
 app = Flask(__name__)
-bcrypt = Bcrypt(app)
+
 
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql:///TheMealDB"
 app.config['SECRET_KEY'] = "it's a secret"
@@ -22,9 +24,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
+db.init_app(app)
+migrate.init_app(app, db)
 toolbar = DebugToolbarExtension(app)
 connect_db(app)
-migrate = Migrate(app, db)
+# migrate = Migrate(app, db)
 
 def create_app():
     app = Flask(__name__)
@@ -78,6 +82,8 @@ def register():
                 password=form.password.data,
                 email=form.email.data,
                 image_url=form.image_url.data or User.image_url.default.arg,
+                bio=form.bio.data,
+                location=form.location.data
             )
             db.session.commit()
         except IntegrityError:
@@ -154,25 +160,52 @@ def meal(id):
     meal['id'] = meal['idMeal']
     return render_template('meal.html', meal=meal)
 
-@app.route('/search', methods=['POST'])
-@login_required
+def search_meals(main_ingredient, extra_ingredients):
+    
+    filter_url = f"https://www.themealdb.com/api/json/v1/1/filter.php?i={main_ingredient}"
+    search_main_url = f"https://www.themealdb.com/api/json/v1/1/search.php?s={main_ingredient}"
+    filter_response = requests.get(filter_url).json()
+    search_main_response = requests.get(search_main_url).json()
+
+    
+    filter_meals = filter_response.get('meals')
+    search_main_meals = search_main_response.get('meals')
+
+
+    if filter_meals is None:
+        filter_meals = []
+    if search_main_meals is None:
+        search_main_meals = []
+
+   
+    if not filter_meals and not search_main_meals:
+        return []
+
+
+    all_meals = filter_meals + search_main_meals
+
+    for extra_ingredient in extra_ingredients:
+        search_extra_url = f"https://www.themealdb.com/api/json/v1/1/filter.php?i={extra_ingredient}"
+        search_extra_response = requests.get(search_extra_url).json()
+        search_extra_meals = search_extra_response.get('meals')
+        if search_extra_meals is None:
+            search_extra_meals = []
+        if not search_extra_meals:
+            return []
+        all_meals += search_extra_meals
+
+    unique_meals = {meal['idMeal']: meal for meal in all_meals}.values()
+
+    return list(unique_meals)
+
+@app.route('/search', methods=['GET', 'POST'])
 def search():
-    main_ingredient = request.form.get('main_ingredient')
-    extra_ingredients = request.form.get('extra_ingredients').split(',')
-
-    # Get meals with the main ingredient
-    response = requests.get(f'https://www.themealdb.com/api/json/v1/1/filter.php?i={main_ingredient}')
-    meals = response.json().get('meals', [])
-
-    # Filter meals that contain all extra ingredients
-    for ingredient in extra_ingredients:
-        response = requests.get(f'https://www.themealdb.com/api/json/v1/1/filter.php?i={ingredient.strip()}')
-        ingredient_meals = response.json().get('meals', [])
-        meals = [meal for meal in meals if meal in ingredient_meals]
-
-    if meals:
-        session['meals'] = meals 
-    return redirect(url_for('home'))
+    if request.method == 'POST':
+        main_ingredient = request.form.get('main_ingredient')
+        extra_ingredients = request.form.get('extra_ingredients').split(',')
+        meals = search_meals(main_ingredient, extra_ingredients)
+        return render_template('index.html', meals=meals)
+    return render_template('index.html', meals=meals, meal=meal)
 
 def add_favorite(user_id, recipe_id):
     """Add a recipe to a user's favorites."""
@@ -274,6 +307,4 @@ def users_show(user_id):
     return render_template('users/show.html', user=user, recipes=recipes)
 
 if __name__ == '__main__':
-    app = create_app()
-    db.create_all()
     app.run(debug=True)

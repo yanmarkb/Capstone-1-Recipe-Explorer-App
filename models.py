@@ -8,11 +8,15 @@ from sqlalchemy.sql import func
 from sqlalchemy.schema import CheckConstraint
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_bcrypt import Bcrypt
+from flask_migrate import Migrate
+
+db = SQLAlchemy()
 
 bcrypt = Bcrypt()
+migrate = Migrate()
 
 # Initialize the SQLAlchemy extension for interacting with the database.
-db = SQLAlchemy()
+
 
 class Favorite(db.Model):
     """Favorite in the system."""
@@ -94,7 +98,7 @@ class User(db.Model):
         return bcrypt.check_password_hash(self.password, password)
 
     @classmethod
-    def signup(cls, username, email, password, image_url):
+    def signup(cls, username, email, password, image_url, bio, location):
         """Sign up user.
 
         Hashes password and adds user to system.
@@ -183,4 +187,4 @@ class SavedRecipe(db.Model):
 def connect_db(app):
     """Connect this database to provided Flask app."""
     db.app = app
-    db.init_app(app)
+    # db.init_app(app)

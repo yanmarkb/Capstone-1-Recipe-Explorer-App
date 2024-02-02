@@ -7,7 +7,7 @@
             <ul class="list-group" id="meals">
                 {% for meal in meals %}
                     <div>
-                        <h2>{{ meal.title }}</h2>
+                        <h2><a href="{{ url_for('meal', id=meal.id) }}">{{ meal.title }}</a></h2>
                     </div>
                 {% endfor %}
             </ul>

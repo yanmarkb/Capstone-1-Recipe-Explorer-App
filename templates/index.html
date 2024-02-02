@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <main>
-        <div class="container">
-            {% for meal in meals %}
-                <div class="meal">
-                    <h2><a href="{{ url_for('meal', id=meal.idMeal) }}">{{ meal.strMeal }}</a></h2>
-                    <img src="{{ meal.strMealThumb }}" alt="{{ meal.strMeal }}">
-                </div>
-            {% endfor %}
+<main>
+    <div class="container">
+        {% for meal in meals %}
+        <div class="meal">
+            <h2><a href="{{ url_for('meal', id=meal.idMeal) }}">{{ meal.strMeal }}</a></h2>
+            <img src="{{ meal.strMealThumb }}" alt="{{ meal.strMeal }}">
         </div>
-    </main>
+        {% endfor %}
+    </div>
+</main>
 {% endblock %}
