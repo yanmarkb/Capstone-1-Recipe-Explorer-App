@@ -2,7 +2,7 @@ import os
 import requests
 import random
 from functools import wraps
-from flask import Flask, render_template, request, flash, redirect, session, g, url_for
+from flask import Flask, render_template, request, flash, redirect, session, g, url_for, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 import pdb
@@ -286,6 +286,13 @@ def show_favorites(user_id):
         meals = [favorite.recipe for favorite in favorites]
         meal = [favorite.recipe for favorite in favorites]
         return render_template('show_favorites.html', user=user, favorites=favorites, meals=meals, meal=meal)
+
+@app.route('/meal/is_favorited/<int:meal_id>', methods=['GET'])
+@login_required
+def is_favorited(meal_id):
+    favorite = Favorite.query.filter_by(user_id=g.user.id, recipe_id=meal_id).first()
+    is_favorited = favorite is not None
+    return jsonify({'isFavorited': is_favorited})
         
 @app.route('/users')
 @login_required

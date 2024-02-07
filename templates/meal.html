@@ -16,9 +16,8 @@
 
     <form method="POST" action="{{ url_for('show_favorites', user_id=g.user.id) }}">
         <input type="hidden" name="recipe_id" value="{{ meal.idMeal }}">
-        <button type="submit">Favorite</button>
+        <button>
+            <i id="favorite-icon" class="fa fa-heart" style="color: grey;" data-meal-id="{{ meal.idMeal }}"></i>
+        </button>
     </form>
-    {% if meal %}
-        <a href="{{ url_for('show_favorites', user_id=g.user.id, id=meal.idMeal) }}">View Favorites</a>
-    {% endif %}
 {% endblock %}
