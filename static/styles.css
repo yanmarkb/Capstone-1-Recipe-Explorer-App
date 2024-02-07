@@ -2,3 +2,64 @@
     display: none;
 }
 
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #98FB98;
+    color: black;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-decoration: none;
+}
+
+nav a {
+    color: black;
+    margin-right: 20px;
+    text-decoration: none;
+}
+
+nav a:hover {
+    color: orange;
+}
+
+nav a:active {
+    color: darkorange;
+}
+
+.input-container {
+    margin: auto;
+    
+}
+
+nav form.input-container {
+    margin: 0 auto;
+    right: 5%;
+}
+
+nav form.input-container input {
+    border: 3px solid darkorange;
+    background-color: orange;
+    color: black;
+    border-radius: 5px;
+    height: 25px;
+    width: 200px;
+}
+
+button[type="submit"] {
+    border: 3px solid darkorange;
+    background-color: orange;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+}
+
+button[type="submit"]:hover {
+    background-color: #CC5500;
+}
+
+nav form.input-container input::placeholder {
+    color: black;
+}

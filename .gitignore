@@ -1,2 +1,5 @@
 venv/
 .DS_Store
+get-pip.py
+reset_db.py
+seed.py
