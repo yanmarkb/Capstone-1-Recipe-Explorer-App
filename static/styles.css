@@ -17,7 +17,7 @@ nav {
 
 nav a {
     color: black;
-    margin-right: 20px;
+    margin: 20px;
     text-decoration: none;
 }
 
@@ -30,8 +30,10 @@ nav a:active {
 }
 
 .input-container {
-    margin: auto;
-    
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    padding-right: 325px;
 }
 
 nav form.input-container {
@@ -62,4 +64,50 @@ button[type="submit"]:hover {
 
 nav form.input-container input::placeholder {
     color: black;
+}
+
+.centered-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.centered-button {
+    text-align: center;
+}
+
+.centered-button input[type="submit"] {
+    border: 3px solid darkorange;
+    background-color: orange;
+    border-radius: 5px;
+    color: black;
+    transition: background-color 0.3s ease;
+}
+
+.centered-button input[type="submit"]:hover {
+    background-color: darkorange;
+}
+
+.centered-form input[type="text"], .centered-form input[type="password"] {
+    border: 3px solid darkorange;
+    border-radius: 5px;
+    background-color: orange;
+    color: black;
+    height: 25px;
+    width: 200px;
+}
+
+.centered-form input[type="text"]::placeholder, .centered-form input[type="password"]::placeholder {
+    color: black;
+}
+
+.centered-form a {
+    text-decoration: none;
+    color: black;
+}
+
+.centered-form a:hover {
+    color: orange;
 }

@@ -2,6 +2,7 @@
 
 {% block content %}
     {% if g.user is none %}
+    <div class="centered-form" >
         <h1>Login</h1>
         <form method="POST" action="{{ url_for('login') }}">
             {{ form.hidden_tag() }}
@@ -13,8 +14,10 @@
                 {{ form.password.label }}<br>
                 {{ form.password(size=30) }}
             </p>
-            <p>{{ form.submit() }}</p>
+            <p class="centered-button">{{ form.submit() }}</p>
         </form>
+        <a href="{{ url_for('register') }}">Register</a>
+    </div>
     {% else %}
         <h1>Welcome, {{ g.user.username }}!</h1>
     {% endif %}

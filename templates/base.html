@@ -20,21 +20,21 @@
 
 <body>
     <nav>
-        <a href="{{ url_for('home') }}">Home</a>
+        
         {% if g.user %}
+        <a href="{{ url_for('home') }}">Home</a>
         <a href="{{ url_for('show_favorites', user_id=g.user.id) }}">Favorites</a>
         <a href="{{ url_for('users_show', user_id=g.user.id) }}">Profile</a>
         <a href="{{ url_for('logout') }}">Logout</a>
-        {% else %}
-        <a href="{{ url_for('login') }}">Login</a>
-        <a href="{{ url_for('register') }}">Register</a>
-        {% endif %}
+        
+        
         <form class="input-container" method="POST" action="{{ url_for('search') }}">
             <input type="text" name="main_ingredient" class="text input" placeholder="Main Ingredient">
             <input type="text" name="extra_ingredients" class="text input"
                 placeholder="Extra Ingredients">
             <button type="submit"><i class="fas fa-search magnifier" id="magnifier"></i></button>
         </form>
+        {% endif %}
     </nav>
 
     {% block content %}

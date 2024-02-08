@@ -2,28 +2,30 @@
 
 {% block content %}
 {% if g.user is none %}
-<h1>Register</h1>
-<form method="POST" action="{{ url_for('register') }}">
-    {{ form.hidden_tag() }}
-    <p>
-        {{ form.username.label }}<br>
-        {{ form.username(size=30) }}
-    </p>
-    <p>
-        {{ form.email.label }}<br>
-        {{ form.email(size=30) }}
-    </p>
-    <p>
-        {{ form.password.label }}<br>
-        {{ form.password(size=30) }}
-    </p>
-    <p>
-        {{ form.confirm_password.label }}<br>
-        {{ form.confirm_password(size=30) }}
-    </p>
-
-    <p>{{ form.submit() }}</p>
-</form>
+<div class="centered-form">
+    <h1>Register</h1>
+    <form method="POST" action="{{ url_for('register') }}">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.username.label }}<br>
+            {{ form.username(size=30) }}
+        </p>
+        <p>
+            {{ form.email.label }}<br>
+            {{ form.email(size=30) }}
+        </p>
+        <p>
+            {{ form.password.label }}<br>
+            {{ form.password(size=30) }}
+        </p>
+        <p>
+            {{ form.confirm_password.label }}<br>
+            {{ form.confirm_password(size=30) }}
+        </p>
+        <p class="centered-button">{{ form.submit() }}</p>
+    </form>
+    <a href="{{ url_for('login') }}">Login</a>
+</div>
 {% else %}
 <!-- User is logged in, so don't display the form -->
 <h1>Welcome, {{ g.user.username }}!</h1>
