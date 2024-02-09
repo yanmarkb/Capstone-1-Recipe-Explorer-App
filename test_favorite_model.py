@@ -56,7 +56,21 @@ class FavoriteModelTestCase(TestCase):
     def test_favorite_create_fail(self):
         """Does Favorite.create fail to create a new favorite if any of the validations (e.g. uniqueness, non-nullable fields) fail?"""
         with self.app_context:
+            # Try to create a duplicate favorite
+            duplicate_favorite = Favorite(user_id=self.testuser1.id, recipe_id=self.testrecipe1.id)
             with self.assertRaises(IntegrityError):
-                invalid_favorite = Favorite(user_id=None, recipe_id=1)
-                db.session.add(invalid_favorite)
+                db.session.add(duplicate_favorite)
                 db.session.commit()
+
+    def test_favorite_create_no_user_id(self):
+        """Does Favorite.create fail to create a new favorite if user_id is None?"""
+        with self.app_context:
+            invalid_favorite = Favorite(user_id=None, recipe_id=self.testrecipe1.id)
+            db.session.add(invalid_favorite)
+            print("Added invalid favorite to session")
+            try:
+                db.session.flush()
+                print("Flushed session")
+            except IntegrityError:
+                print("Caught IntegrityError")
+                raise
