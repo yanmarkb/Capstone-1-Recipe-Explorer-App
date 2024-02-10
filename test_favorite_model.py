@@ -74,3 +74,33 @@ class FavoriteModelTestCase(TestCase):
             except IntegrityError:
                 print("Caught IntegrityError")
                 raise
+
+    def __repr__(self):
+        return f"<Favorite #{self.id}: User {self.user_id} - Recipe {self.recipe_id}>"
+
+    def test_favorite_create_with_valid_credentials(self):
+        """Does Favorite.create successfully create a new favorite given valid user and recipe?"""
+        with self.app_context:
+            favorite = Favorite(user_id=self.testuser1.id, recipe_id=self.testrecipe2.id)
+            db.session.add(favorite)
+            db.session.commit()
+
+            found_favorite = Favorite.query.filter_by(user_id=self.testuser1.id, recipe_id=self.testrecipe2.id).first()
+            self.assertIsNotNone(found_favorite)
+
+    def test_favorite_create_with_invalid_credentials(self):
+        """Does Favorite.create fail to create a new favorite if any of the validations (e.g. uniqueness, non-nullable fields) fail?"""
+        with self.app_context:
+            # Try to create a favorite with non-existent user and recipe
+            invalid_favorite = Favorite(user_id=999, recipe_id=999)
+            with self.assertRaises(IntegrityError):
+                db.session.add(invalid_favorite)
+                db.session.commit()
+
+    def test_favorite_exists(self):
+        """Does a favorite exist when given a valid user_id and recipe_id?"""
+        with self.app_context:
+            found_favorite = Favorite.query.filter_by(user_id=self.testuser1.id, recipe_id=self.testrecipe1.id).first()
+            self.assertIsNotNone(found_favorite)
+            self.assertEqual(found_favorite.user_id, self.testuser1.id)
+            self.assertEqual(found_favorite.recipe_id, self.testrecipe1.id)

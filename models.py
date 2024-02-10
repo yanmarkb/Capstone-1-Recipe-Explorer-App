@@ -89,6 +89,7 @@ class User(db.Model):
     )
 
     favorite_recipes = db.relationship('Recipe', secondary='favorites' , backref='favorited_by_user')
+    recipes = db.relationship('Recipe', backref='user', cascade='all, delete-orphan')
 
     def __repr__(self):
         return f"<User #{self.id}: {self.username}, {self.email}>"
@@ -154,6 +155,7 @@ class Recipe(db.Model):
 
     favorited_by = db.relationship('Favorite', backref='favorited_recipe')
     ingredients = db.relationship('RecipeIngredient', backref='recipe', lazy=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 class Ingredient(db.Model):
     """Ingredient in the system."""
