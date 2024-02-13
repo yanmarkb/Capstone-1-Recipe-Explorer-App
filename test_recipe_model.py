@@ -3,7 +3,7 @@ from unittest import TestCase
 from models import db, User, Recipe
 from app import app
 
-os.environ['DATABASE_URL'] = "postgresql:///recipe-test"
+os.environ['DATABASE_URL'] = "postgresql:///Test_TheMealDB"
 
 class RecipeModelTestCase(TestCase):
     """Test views for recipes."""
