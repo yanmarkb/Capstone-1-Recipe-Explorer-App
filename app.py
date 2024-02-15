@@ -216,10 +216,8 @@ def search():
 
 def add_favorite(user_id, recipe_id):
     """Add a recipe to a user's favorites."""
-
     
     favorite = Favorite(user_id=user_id, recipe_id=recipe_id)
-
    
     db.session.add(favorite)
     db.session.commit()
@@ -242,7 +240,8 @@ def toggle_favorite(meal_id):
         db.session.delete(favorite)
     else:
         # If the user hasn't favorited the meal, add a new favorite
-        add_favorite(g.user.id, meal.id)
+        favorite = Favorite(user_id=g.user.id, recipe_id=meal.id)
+        db.session.add(favorite)
 
     db.session.commit()
 

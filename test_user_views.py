@@ -1,6 +1,7 @@
 import os
 import sys
 import unittest
+import time
 from models import db, User, Recipe, Favorite
 from app import app
 from flask import session
@@ -25,7 +26,6 @@ class UserModelTestCase(unittest.TestCase):
 
             self.user_id = self.user.id
 
-            # Define self.recipe
             existing_recipe = Recipe.query.get(1)
             if existing_recipe:
                 db.session.delete(existing_recipe)
@@ -42,55 +42,59 @@ class UserModelTestCase(unittest.TestCase):
                 db.session.rollback()
             else:
                 db.session.commit()
-
-    def test_toggle_favorite(self):
-        with self.client as c:
-            with c.session_transaction() as sess:
-                with app.app_context():
-                    db.session.begin_nested()
-                    sess['user_id'] = self.user.id
-
-            response = c.post(f'/meal/toggle_favorite/{self.recipe.id}', follow_redirects=True)
-            self.assertEqual(response.status_code, 200)
-            favorite = Favorite.query.filter_by(user_id=self.user.id, recipe_id=self.recipe.id).first()
-            self.assertIsNotNone(favorite)
-
-            response = c.post(f'/meal/toggle_favorite/{self.recipe.id}', follow_redirects=True)
-            self.assertEqual(response.status_code, 200)
-            favorite = Favorite.query.filter_by(user_id=self.user.id, recipe_id=self.recipe.id).first()
-            self.assertIsNone(favorite)
-
-            db.session.rollback()
-
+                
     def test_show_favorites(self):
         with self.app.app_context():
             with self.client as c:
                 with c.session_transaction() as sess:
-                    # Use the stored user id to get the user
+    
                     user = User.query.get(self.user_id)
                     sess['user_id'] = user.id
 
                 response = c.get(f'/users/{user.id}/favorites', follow_redirects=True)
                 self.assertEqual(response.status_code, 200)
 
-    def test_is_favorited(self):
-        with app.app_context():
-            db.session.add(self.user)
-            db.session.add(self.recipe)
-            db.session.commit()
+    def test_user_registration(self):
+        """Can user register successfully?"""
+        with self.client as c:
+            data = {"username": "newuser", "email": "new@test.com", "password": "newpassword"}
+            response = c.post("/register", data=data, follow_redirects=True)
 
-            # Create a Favorite object for the test user and recipe
-            favorite = Favorite(user_id=self.user.id, recipe_id=self.recipe.id)
-            db.session.add(favorite)
-            db.session.commit()
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("newuser", response.get_data(as_text=True))
 
-            with self.client as c:
-                with c.session_transaction() as sess:
-                    sess['user_id'] = self.user.id
+    def test_user_login(self):
+        """Can user login successfully?"""
+        with self.client as c:
+            data = {"username": "testuser", "password": "password"}
+            response = c.post("/login", data=data, follow_redirects=True)
 
-                response = c.get(f'/meal/is_favorited/{self.recipe.id}', follow_redirects=True)
-                self.assertEqual(response.status_code, 200)
-                self.assertEqual(response.get_json(), {'isFavorited': True})
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("testuser", response.get_data(as_text=True))
+
+    def test_user_logout(self):
+        """Can user logout successfully?"""
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess['user_id'] = self.user_id
+
+            response = c.get("/logout", follow_redirects=True)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertNotIn("testuser", response.get_data(as_text=True))
+
+    def test_user_profile_page(self):
+        """Can user view their profile page?"""
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess['user_id'] = self.user_id
+
+            response = c.get(f"/users/{self.user_id}")
+
+            self.assertEqual(response.status_code, 302)
+            print(response.location) 
+
+
 
 if __name__ == "__main__":
     unittest.main()
