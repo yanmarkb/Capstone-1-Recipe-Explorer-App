@@ -2,11 +2,7 @@
 
 {% block content %}
 <style>
-    #submit {
-        display: none;
-    }
-
-    #header_image {
+    #submit, #header_image {
         display: none;
     }
 </style>
@@ -15,14 +11,16 @@
     <div class="col-md-4">
         <h2 class="join-message">Edit Your Profile</h2>
 
-
-        <form method="POST" id="user_form">
+        <form method="POST" action="/users/profile" id="user_form" class="centered-form">
             {{ form.hidden_tag() }}
 
             {% for field in form if field.widget.input_type != 'hidden' and field.name != 'password' %}
             {% for error in field.errors %}
             <span class="text-danger">{{ error }}</span>
             {% endfor %}
+            {% if field.id not in ['submit', 'header_image', 'confirm_password'] %}
+            <label for="{{ field.id }}">{{ field.label.text }}</label>
+            {% endif %}
             {{ field(placeholder=field.label.text, class="form-control") }}
             {% endfor %}
 
@@ -34,10 +32,11 @@
             </span>
             {% endfor %}
             {% endif %}
+            <label for="{{ form.password.id }}">Password</label>
             {{ form.password(placeholder="Enter your password to confirm", class="form-control") }}
 
-            <div class="edit-btn-area">
-                <button class="btn btn-success">Edit this user!</button>
+            <div class="edit-btn-area centered-button">
+                <button type="submit" class="btn btn-success" id="edit-button">Edit this user</button>
                 <a href="/users/{{ user.id }}" class="btn btn-outline-secondary">Cancel</a>
             </div>
         </form>

@@ -240,8 +240,7 @@ def toggle_favorite(meal_id):
         db.session.delete(favorite)
     else:
         # If the user hasn't favorited the meal, add a new favorite
-        favorite = Favorite(user_id=g.user.id, recipe_id=meal.id)
-        db.session.add(favorite)
+        add_favorite(g.user.id, meal.id)
 
     db.session.commit()
 

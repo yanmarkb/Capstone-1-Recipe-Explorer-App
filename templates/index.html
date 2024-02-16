@@ -3,12 +3,20 @@
 {% block content %}
 <main>
     <div class="container">
-        {% for meal in meals %}
-        <div class="meal">
-            <h2><a href="{{ url_for('meal', id=meal.idMeal) }}">{{ meal.strMeal }}</a></h2>
-            <img src="{{ meal.strMealThumb }}" alt="{{ meal.strMeal }}">
-        </div>
-        {% endfor %}
+        {% if meals %}
+            {% for meal in meals %}
+            <a href="{{ url_for('meal', id=meal.idMeal) }}" style="text-decoration: none; color: inherit;">
+                <div class="meal">
+                    <h2>{{ meal.strMeal }}</h2>
+                    <img src="{{ meal.strMealThumb }}" alt="{{ meal.strMeal }}">
+                </div>
+            </a>
+            {% endfor %}
+        {% else %}
+            <div class="welcome-message">
+                Welcome to Recipe Explorer. Please use the search bar above!
+            </div>
+        {% endif %}
     </div>
 </main>
 {% endblock %}

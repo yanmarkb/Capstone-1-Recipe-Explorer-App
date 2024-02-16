@@ -1,23 +1,45 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>{{ meal.strMeal }}</h1>
+<div class="meal-container">
     <img src="{{ meal.strMealThumb }}" alt="{{ meal.strMeal }}">
-    <h2>Ingredients</h2>
-    <ul>
-        {% for i in range(1, 21) %}
-            {% if meal['strIngredient' ~ i] %}
-                <li>{{ meal['strIngredient' ~ i] }} - {{ meal['strMeasure' ~ i] }}</li>
-            {% endif %}
-        {% endfor %}
-    </ul>
-    <h2>Instructions</h2>
-    <p>{{ meal.strInstructions }}</p>
 
-    <form method="POST" action="{{ url_for('show_favorites', user_id=g.user.id) }}">
-        <input type="hidden" name="recipe_id" value="{{ meal.idMeal }}">
+    <div class="meal-details">
+        <h1 class="fixed-meal-name">{{ meal.strMeal }}</h1>
+
+        <!-- <h1>{{ meal.strMeal }}</h1> -->
+
+        <div class="dropdown">
+            <button class="dropbtn">Ingredients</button>
+            <div class="dropdown-content">
+                <ul>
+                    {% for i in range(1, 21) %}
+                        {% if meal['strIngredient' ~ i] %}
+                            <li>{{ meal['strIngredient' ~ i] }} - {{ meal['strMeasure' ~ i] }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <button class="dropbtn">Instructions</button>
+            <div class="dropdown-content">
+                {% set instructions = meal.strInstructions.split('. ') %}
+                <ul>
+                    {% for instruction in instructions %}
+                        {% if instruction %}
+                            <li>{{ instruction ~ '.' }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+    <form method="POST" action="{{ url_for('toggle_favorite', meal_id=meal.idMeal) }}" class="favorite-button">
         <button>
             <i id="favorite-icon" class="fa fa-heart" style="color: grey;" data-meal-id="{{ meal.idMeal }}"></i>
         </button>
     </form>
+</div>
 {% endblock %}

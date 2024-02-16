@@ -1,18 +1,23 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="col-sm-6">
-    <ul class="list-group" id="messages">
-        <li class="list-group-item">
-            <div class="message-area">
-                <h2>{{ form.username.data }}</h2>
-                <p>Email: {{ form.email.data }}</p>
-                <p>Bio: {{ form.bio.data }}</p>
-                <p>Location: {{ form.location.data }}</p>
-                <img src="{{ form.image_url.data }}" alt="User image">
-                <a href="{{ url_for('profile') }}">Edit Profile</a>
-            </div>
-        </li>
-    </ul>
+<div class="profile-container">
+    <div class="col-sm-6 profile-dropdown">
+        <ul class="list-group" id="messages">
+            <li class="list-group-item">
+                <div class="message-area">
+                    <img src="{{ form.image_url.data }}" alt="User image" id="profile-icon">
+                    <div class="user-info">
+                        <h2 class="fixed-profile-name">{{ form.username.data }}</h2>
+                        <p>Email: {{ form.email.data }}</p>
+                        <p>Bio: {{ form.bio.data }}</p>
+                        <p>Location: {{ form.location.data }}</p>
+                        <p><a href="{{ url_for('profile') }}" class="profile-button button">Edit Profile</a></p>
+                    </div>
+                    
+                </div>
+            </li>
+        </ul>
+    </div>
 </div>
 {% endblock %}

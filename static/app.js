@@ -29,3 +29,10 @@ $("#favorite-icon").click(function () {
 		},
 	});
 });
+
+document.querySelectorAll(".dropbtn").forEach((button) => {
+	button.addEventListener("click", () => {
+		const dropdownContent = button.nextElementSibling;
+		dropdownContent.classList.toggle("show");
+	});
+});
