@@ -369,3 +369,104 @@ nav form.input-container input::placeholder {
     margin-top: 50px;
     font-size: 20px;
 }
+
+@media only screen and (max-width: 600px){
+
+    .input-container {
+        flex-direction: column;
+        padding-right: 0;
+    }
+
+    nav form.input-container {
+        right: 0;
+    }
+
+    .centered-form input[type="text"], .centered-form input[type="password"] {
+        width: 100%;
+    }
+
+    button[type="submit"] {
+        width: 100%;
+    }
+
+    nav a {
+        margin: 10px;
+    }
+
+    nav form.input-container input {
+        width: 100%;
+    }
+
+    .centered-button input[type="submit"] {
+        width: 100%;
+    }
+
+    .dropbtn {
+        padding: 10px; 
+        font-size: 14px; 
+    }
+
+    .favorite-button button {
+        padding: 5px; 
+    }
+
+    #favorite-icon {
+        padding: 3px;
+    }
+
+    .fixed-meal-name {
+        left: 10%;
+    }
+
+    .favorites-container, .profile-container {
+        width: 90%;
+        padding: 10px;
+    }
+
+    .message-area {
+        flex-direction: column; 
+        align-items: flex-start; 
+    }
+
+    #profile-icon {
+        margin-right: 0; 
+        margin-bottom: 10px; 
+    }
+
+    .user-info {
+        align-items: center; 
+    }
+
+    .profile-button {
+        font-size: 14px; 
+    }
+
+    .profile-dropdown {
+        top: 30px; 
+    }
+
+    .profile-dropdown-content {
+        padding: 10px 14px; 
+    }
+
+    .profile-dropbtn {
+        padding: 14px; 
+        font-size: 14px; 
+    }
+
+    .profile-dropbtn:after {
+        font-size: 8px; 
+        padding-left: 3px; 
+    }
+
+    #edit-button {
+        width: 100%;
+        padding: 5px; 
+        margin: 5px 0;  
+    }
+
+    .join-message {
+        font-size: 16px; ß
+        margin-top: 30px; 
+    }
+}
