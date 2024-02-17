@@ -8,10 +8,11 @@ from sqlalchemy.exc import IntegrityError
 import pdb
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from models import connect_db, db, migrate, User, Recipe, Ingredient, RecipeIngredient, UserRecipe, SavedRecipe, Favorite
+from models import connect_db, db, migrate, User, Recipe, Favorite
 from forms import LoginForm, RegistrationForm
 from flask_bcrypt import Bcrypt
 import random
+from concurrent.futures import ThreadPoolExecutor
 
 CURR_USER_KEY = "curr_user"
 
@@ -186,15 +187,17 @@ def search_meals(main_ingredient, extra_ingredients):
 
     # If extra_ingredients is not empty, filter meals based on extra ingredients
     if extra_ingredients:
-        for meal in all_meals:
+        def meal_passes_filter(meal):
             meal_id = meal['idMeal']
             lookup_url = f"https://www.themealdb.com/api/json/v1/1/lookup.php?i={meal_id}"
             lookup_response = requests.get(lookup_url).json()
             lookup_meal = lookup_response.get('meals', [])[0]
-            for ingredient in extra_ingredients:
-                if ingredient not in lookup_meal.values():
-                    all_meals.remove(meal)
-                    break
+            lookup_ingredients = set(lookup_meal.values())
+            return all(ingredient in lookup_ingredients for ingredient in extra_ingredients)
+
+        with ThreadPoolExecutor() as executor:
+            meal_results = executor.map(meal_passes_filter, all_meals)
+            all_meals = [meal for meal, passes in zip(all_meals, meal_results) if passes]
 
     # Remove duplicates
     unique_meals = list({meal['idMeal']: meal for meal in all_meals}.values())
@@ -205,48 +208,78 @@ def search_meals(main_ingredient, extra_ingredients):
 
     return unique_meals
 
-@app.route('/search', methods=['GET', 'POST'])
+@app.route('/search', methods=['POST'])
 def search():
     if request.method == 'POST':
         main_ingredient = request.form.get('main_ingredient')
         extra_ingredients = request.form.get('extra_ingredients').split(',')
         meals = search_meals(main_ingredient, extra_ingredients)
+
+        for meal in meals:
+            recipe = Recipe.query.filter_by(title=meal['strMeal']).first()
+            if not recipe:
+                recipe = Recipe(
+                    title=meal['strMeal'],
+                    main_ingredient=main_ingredient,
+                    additional_ingredients=','.join(extra_ingredients),
+                    instructions=meal['strInstructions'], 
+                    user_id=g.user.id,
+                    recipe_id=meal['idMeal']
+                )
+                db.session.add(recipe)
+        db.session.commit()
+
         return render_template('index.html', meals=meals)
-    return render_template('index.html', meals=meals, meal=meal)
+    return render_template('index.html')
 
 def add_favorite(user_id, recipe_id):
     """Add a recipe to a user's favorites."""
     
-    favorite = Favorite(user_id=user_id, recipe_id=recipe_id)
-   
-    db.session.add(favorite)
-    db.session.commit()
+    favorite = Favorite.query.filter_by(user_id=user_id, recipe_id=recipe_id).first()
+    if favorite is None:
+        favorite = Favorite(user_id=user_id, recipe_id=recipe_id)
+        db.session.add(favorite)
+        db.session.commit()
 
 @app.route('/meal/toggle_favorite/<int:meal_id>', methods=['POST'])
 @login_required
 def toggle_favorite(meal_id):
     """Toggle a favorited meal for the currently-logged-in user."""
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
+    # Convert meal_id to string
+    meal_id_str = str(meal_id)
 
-    meal = Recipe.query.get_or_404(meal_id)
+    # Check if the recipe exists
+    recipe = Recipe.query.get(meal_id_str)
+    if recipe is None:
+        # If the recipe doesn't exist, fetch it from API
+        response = requests.get(f'https://www.themealdb.com/api/json/v1/1/lookup.php?i={meal_id}')
+        meal_data = response.json().get('meals', [])[0]
 
-    favorite = Favorite.query.filter_by(user_id=g.user.id, recipe_id=meal.id).first()
+        # Create a new recipe
+        recipe = Recipe(
+            id=meal_id_str, 
+            title=meal_data['strMeal'], 
+            main_ingredient=meal_data['strIngredient1'], 
+            additional_ingredients=','.join([meal_data[f'strIngredient{i}'] for i in range(2, 21) if meal_data[f'strIngredient{i}']]), 
+            instructions=meal_data['strInstructions'], 
+            user_id=g.user.id
+        )
+        db.session.add(recipe)
+        db.session.commit()
+
+    favorite = Favorite.query.filter_by(user_id=str(g.user.id), recipe_id=meal_id_str).first()
 
     if favorite:
         # If the user has already favorited the meal, remove the favorite
         db.session.delete(favorite)
     else:
         # If the user hasn't favorited the meal, add a new favorite
-        add_favorite(g.user.id, meal.id)
+        add_favorite(str(g.user.id), meal_id_str)
 
     db.session.commit()
 
-    # Redirect to the referrer URL if it's set, otherwise redirect to the home page
-    return redirect(request.referrer or url_for('index'))
-
+    return redirect(url_for('show_favorites', user_id=g.user.id))
 
 @app.route('/users/<int:user_id>/favorites', methods=['GET', 'POST'])
 @login_required
@@ -254,7 +287,7 @@ def show_favorites(user_id):
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
-    
+
     user = User.query.get_or_404(user_id)
 
     if request.method == 'POST':
@@ -273,17 +306,14 @@ def show_favorites(user_id):
             else:
                 flash('Recipe not found in TheMealDB API.', 'error')
                 return redirect(url_for('show_favorites', user_id=user.id))
-        favorite = Favorite(user_id=user.id, recipe_id=recipe_id)
-        db.session.add(favorite)
-        db.session.commit()
+        add_favorite(user.id, recipe_id)
         flash('Recipe added to favorites.', 'success')
         return redirect(url_for('show_favorites', user_id=user.id))
 
     else: 
         favorites = Favorite.query.filter_by(user_id=user.id).all()
         meals = [favorite.recipe for favorite in favorites]
-        meal = [favorite.recipe for favorite in favorites]
-        return render_template('show_favorites.html', user=user, favorites=favorites, meals=meals, meal=meal)
+        return render_template('show_favorites.html', user=user, favorites=favorites, meals=meals)
 
 @app.route('/meal/is_favorited/<int:meal_id>', methods=['GET'])
 @login_required

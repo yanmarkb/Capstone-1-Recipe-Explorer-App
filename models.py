@@ -146,46 +146,47 @@ class Recipe(db.Model):
     """Recipe in the system."""
     __tablename__ = 'recipes'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(100), nullable=False)
     main_ingredient = db.Column(db.String(100), nullable=True)
     additional_ingredients = db.Column(db.String(300), nullable=True)
     instructions = db.Column(db.Text, nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    recipe_id = db.Column(db.Integer, nullable=True)
 
     favorited_by = db.relationship('Favorite', backref='favorited_recipe')
-    ingredients = db.relationship('RecipeIngredient', backref='recipe', lazy=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    # ingredients = db.relationship('RecipeIngredient', backref='recipe', lazy=True)
+    
 
-class Ingredient(db.Model):
-    """Ingredient in the system."""
-    __tablename__ = 'ingredients'
+# class Ingredient(db.Model):
+#     """Ingredient in the system."""
+#     __tablename__ = 'ingredients'
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    recipes = db.relationship('RecipeIngredient', backref='ingredient', lazy=True)
+#     id = db.Column(db.Integer, primary_key=True)
+#     name = db.Column(db.String(100), nullable=False)
+#     recipes = db.relationship('RecipeIngredient', backref='ingredient', lazy=True)
 
-class RecipeIngredient(db.Model):
-    """RecipeIngredient in the system."""
-    __tablename__ = 'recipe_ingredients'
+# class RecipeIngredient(db.Model):
+#     """RecipeIngredient in the system."""
+#     __tablename__ = 'recipe_ingredients'
 
-    recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.id'), primary_key=True)
-    ingredient_id = db.Column(db.Integer, db.ForeignKey('ingredients.id'), primary_key=True)
-    quantity = db.Column(db.String(100), nullable=False)
+#     recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.id'), primary_key=True)
+#     ingredient_id = db.Column(db.Integer, db.ForeignKey('ingredients.id'), primary_key=True)
+#     quantity = db.Column(db.String(100), nullable=False)
 
-class UserRecipe(db.Model):
-    __tablename__ = 'user_recipes'
+# class UserRecipe(db.Model):
+#     __tablename__ = 'user_recipes'
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
-    recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.id'), primary_key=True)
+#     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+#     recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.id'), primary_key=True)
 
 
 
-class SavedRecipe(db.Model):
-    __tablename__ = 'saved_recipes'
+# class SavedRecipe(db.Model):
+#     __tablename__ = 'saved_recipes'
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
-    recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.id'), primary_key=True)
+#     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+#     recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.id'), primary_key=True)
 
 def connect_db(app):
     """Connect this database to provided Flask app."""
