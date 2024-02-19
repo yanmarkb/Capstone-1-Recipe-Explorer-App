@@ -159,7 +159,11 @@ def meal(id):
     response = requests.get(f'https://www.themealdb.com/api/json/v1/1/lookup.php?i={id}')
     meal = response.json().get('meals', [])[0]
     meal['id'] = meal['idMeal']
-    return render_template('meal.html', meal=meal)
+
+    # Check if the meal is favorited by the current user
+    is_favorited = Favorite.query.filter_by(user_id=g.user.id, recipe_id=id).first() is not None
+
+    return render_template('meal.html', meal=meal, is_favorited=is_favorited)
 
 def search_meals(main_ingredient, extra_ingredients):
     # Send requests to the APIs
@@ -279,7 +283,10 @@ def toggle_favorite(meal_id):
 
     db.session.commit()
 
-    return redirect(url_for('show_favorites', user_id=g.user.id))
+    # Check if the meal is now favorited by the current user
+    is_favorited = Favorite.query.filter_by(user_id=str(g.user.id), recipe_id=meal_id_str).first() is not None
+
+    return jsonify({'isFavorited': is_favorited})
 
 @app.route('/users/<int:user_id>/favorites', methods=['GET', 'POST'])
 @login_required

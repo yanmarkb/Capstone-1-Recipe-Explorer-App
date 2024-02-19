@@ -6,44 +6,45 @@ $(document).ready(function () {
 			url: "/meal/is_favorited/" + mealId,
 			type: "GET",
 			success: function (response) {
+				console.log("isFavorited response", response);
 				if (response.isFavorited) {
-					icon.css("color", "red");
+					icon.addClass("favorited");
+					icon.removeClass("not-favorited");
 				} else {
-					icon.css("color", "grey");
+					icon.removeClass("favorited");
+					icon.addClass("not-favorited");
 				}
 			},
 		});
 	});
-});
 
-$(".favorite-icon").click(function () {
-	var mealId = $(this).data("meal-id");
-	var isFavorited = $(this).css("color") === "rgb(255, 0, 0)";
-	var url = "/meal/toggle_favorite/" + mealId;
-	$.ajax({
-		url: url,
-		type: "POST",
-		success: function (response) {
-			if (response.success) {
-				$(this).css(
-					"color",
-					isFavorited ? "rgb(128, 128, 128)" : "rgb(255, 0, 0)"
-				);
-			}
-		}.bind(this),
+	$(".favorite-icon").click(function (event) {
+		event.preventDefault();
+		var mealId = $(this).data("meal-id");
+		var icon = $(this);
+		var isFavorited = icon.hasClass("favorited");
+		console.log("isFavorited before click", isFavorited);
+		var url = "/meal/toggle_favorite/" + mealId;
+		$.ajax({
+			url: url,
+			type: "POST",
+			success: function (response) {
+				console.log("toggleFavorite response", response);
+				if (response.isFavorited) {
+					icon.addClass("favorited");
+					icon.removeClass("not-favorited");
+				} else {
+					icon.removeClass("favorited");
+					icon.addClass("not-favorited");
+				}
+			},
+		});
 	});
-});
 
-document.querySelectorAll(".dropbtn").forEach((button) => {
-	button.addEventListener("click", () => {
-		const dropdownContent = button.nextElementSibling;
-		dropdownContent.classList.toggle("show");
-	});
-});
-
-$(".favorite-icon").click(function () {
-	var mealId = $(this).data("meal-id");
-	$.post("/meal/toggle_favorite/" + mealId, function () {
-		location.reload();
+	document.querySelectorAll(".dropbtn").forEach((button) => {
+		button.addEventListener("click", () => {
+			const dropdownContent = button.nextElementSibling;
+			dropdownContent.classList.toggle("show");
+		});
 	});
 });

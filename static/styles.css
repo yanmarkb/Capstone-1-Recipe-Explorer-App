@@ -2,10 +2,22 @@
     display: none;
 }
 
+.favorited {
+    color: red !important;
+}
+
+.not-favorited {
+    color: grey !important;
+}
+
 body {
     font-family: 'Roboto', sans-serif;
     background-color: #1F6357;
     color: black;
+}
+
+.not-favorited {
+    color: grey;
 }
 
 nav {
@@ -470,3 +482,4 @@ nav form.input-container input::placeholder {
         margin-top: 30px; 
     }
 }
+
