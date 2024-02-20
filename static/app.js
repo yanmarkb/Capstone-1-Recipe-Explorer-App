@@ -45,6 +45,28 @@ $(document).ready(function () {
 		button.addEventListener("click", () => {
 			const dropdownContent = button.nextElementSibling;
 			dropdownContent.classList.toggle("show");
+			button.classList.toggle("open");
 		});
 	});
+});
+
+const carouselImages = document.querySelectorAll(".carousel-image");
+
+Promise.all(
+	Array.from({ length: carouselImages.length }, () =>
+		fetch("https://www.themealdb.com/api/json/v1/1/random.php")
+			.then((response) => response.json())
+			.then((data) => data.meals[0].strMealThumb)
+	)
+).then((imageUrls) => {
+	carouselImages.forEach((image, index) => {
+		image.src = imageUrls[index];
+	});
+
+	let activeIndex = 0;
+	setInterval(() => {
+		carouselImages[activeIndex].classList.remove("active");
+		activeIndex = (activeIndex + 1) % carouselImages.length;
+		carouselImages[activeIndex].classList.add("active");
+	}, 3000);
 });

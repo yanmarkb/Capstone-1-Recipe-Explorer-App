@@ -220,6 +220,10 @@ def search():
         meals = search_meals(main_ingredient, extra_ingredients)
 
         for meal in meals:
+            if 'strInstructions' not in meal:
+                flash("There are no meals with this ingredient/ingredients, please use a different term")
+                return redirect(url_for('home')) 
+
             recipe = Recipe.query.filter_by(title=meal['strMeal']).first()
             if not recipe:
                 recipe = Recipe(
