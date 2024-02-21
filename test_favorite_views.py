@@ -51,6 +51,7 @@ class FavoriteViewTestCase(unittest.TestCase):
                 db.session.commit()
 
     def test_toggle_favorite(self):
+        """Can a user toggle a favorite?"""
         with self.client.session_transaction() as session:
             with self.app.app_context():
                 self.user = User.query.get(self.user_id)

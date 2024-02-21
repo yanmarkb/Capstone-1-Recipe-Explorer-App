@@ -44,6 +44,8 @@ class RecipeViewTestCase(unittest.TestCase):
                 db.session.commit()
 
     def test_show_favorites(self):
+        """Can a user view their favorites?"""
+
         with self.app.app_context():
             with self.client as c:
                 with c.session_transaction() as sess:
