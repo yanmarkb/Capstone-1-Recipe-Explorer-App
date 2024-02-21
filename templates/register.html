@@ -4,6 +4,17 @@
 {% if g.user is none %}
 <div class="centered-form">
     <h1>Register</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class=flashes>
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
     <form method="POST" action="{{ url_for('register') }}">
         {{ form.hidden_tag() }}
         <p>
@@ -27,7 +38,5 @@
     <a href="{{ url_for('login') }}">Login</a>
 </div>
 {% else %}
-<!-- User is logged in, so don't display the form -->
-<h1>Welcome, {{ g.user.username }}!</h1>
 {% endif %}
 {% endblock %}

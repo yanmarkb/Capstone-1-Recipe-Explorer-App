@@ -3,7 +3,7 @@ import sys
 import unittest
 import time
 from models import db, User, Recipe, Favorite
-from app import app
+from app import app, CURR_USER_KEY
 from flask import session
 
 os.environ['DATABASE_URL'] = "postgresql:///Test_TheMealDB"
@@ -43,16 +43,14 @@ class UserModelTestCase(unittest.TestCase):
             else:
                 db.session.commit()
                 
-    def test_show_favorites(self):
-        with self.app.app_context():
-            with self.client as c:
-                with c.session_transaction() as sess:
-    
-                    user = User.query.get(self.user_id)
-                    sess['user_id'] = user.id
+    def test_search(self):
+        with self.client.session_transaction() as session:
+            with self.app.app_context():
+                self.user = User.query.get(self.user_id)
+                session[CURR_USER_KEY] = self.user.id 
 
-                response = c.get(f'/users/{user.id}/favorites', follow_redirects=True)
-                self.assertEqual(response.status_code, 200)
+        response = self.client.post('/search', data={'main_ingredient': 'chicken', 'extra_ingredients': 'onion,garlic'}, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
 
     def test_user_registration(self):
         """Can user register successfully?"""

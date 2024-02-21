@@ -50,15 +50,6 @@ class FavoriteViewTestCase(unittest.TestCase):
             else:
                 db.session.commit()
 
-    def test_search(self):
-        with self.client.session_transaction() as session:
-            with self.app.app_context():
-                self.user = User.query.get(self.user_id)
-                session[CURR_USER_KEY] = self.user.id 
-
-        response = self.client.post('/search', data={'main_ingredient': 'chicken', 'extra_ingredients': 'onion,garlic'}, follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
-
     def test_toggle_favorite(self):
         with self.client.session_transaction() as session:
             with self.app.app_context():

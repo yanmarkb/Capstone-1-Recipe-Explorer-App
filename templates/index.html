@@ -3,6 +3,7 @@
 {% block content %}
 <main>
     <div class="container">
+        
         {% with messages = get_flashed_messages() %}
             {% if messages %}
                 <ul class=flashes>
@@ -12,6 +13,7 @@
                 </ul>
             {% endif %}
         {% endwith %}
+
         {% if meals %}
             {% for meal in meals %}
             <a href="{{ url_for('meal', id=meal.idMeal) }}" style="text-decoration: none; color: inherit;">
@@ -25,6 +27,7 @@
             <div class="welcome-message">
                 <p>Welcome to Recipe Explorer. Please use the search bar above to begin looking for meals!</p>
             </div>
+            
             <div class="carousel">
                 <img class="carousel-image carousel-image-1" src="{{ meal.strMealThumb }}" alt="Meal Image">
                 <img class="carousel-image carousel-image-2" src="{{ meal.strMealThumb }}" alt="Meal Image">

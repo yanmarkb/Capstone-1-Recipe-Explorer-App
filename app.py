@@ -77,6 +77,10 @@ def register():
     """Handle user signup."""
     form = RegistrationForm()
     if form.validate_on_submit():
+        if form.password.data != form.confirm_password.data:
+            flash('Passwords do not match', 'error')
+            return render_template('register.html', form=form)
+
         try:
             user = User.signup(
                 username=form.username.data,
@@ -88,7 +92,7 @@ def register():
             )
             db.session.commit()
         except IntegrityError:
-            flash("Username already taken", 'danger')
+            flash("Username or email already taken", 'danger')
             return render_template('register.html', form=form)
         do_login(user)
         return redirect("/")
@@ -104,7 +108,6 @@ def login():
                                  form.password.data)
         if user:
             do_login(user)
-            flash(f"Hello, {user.username}!", "success")
             return redirect("/")
         flash("Invalid credentials.", 'danger')
     return render_template('login.html', form=form)
@@ -114,7 +117,6 @@ def logout():
     """Handle logout of user."""
     do_logout()
     g.user = None
-    flash("You have successfully logged out. See you later!", "success")
     return redirect('/')
 
 
@@ -124,22 +126,11 @@ def home():
     if g.user is None:
         return redirect(url_for('login'))
 
-    meals = session.pop('meals', []) 
-
+    meals = []
     if request.method == 'POST':
         main_ingredient = request.form.get('main_ingredient')
         extra_ingredients = request.form.get('extra_ingredients').split(',')
-
-        response = requests.get(f'https://www.themealdb.com/api/json/v1/1/filter.php?i={main_ingredient}')
-        meals = response.json().get('meals', [])
-
-        for ingredient in extra_ingredients:
-            response = requests.get(f'https://www.themealdb.com/api/json/v1/1/filter.php?i={ingredient}')
-            meals += response.json().get('meals', [])
-
-    # Select 3 random meals if there are more than 3 meals
-    if len(meals) > 3:
-        meals = random.sample(meals, 3)
+        meals = search_meals(main_ingredient, extra_ingredients)
 
     return render_template('index.html', meals=meals, meal=meal)
 
@@ -214,6 +205,8 @@ def search_meals(main_ingredient, extra_ingredients):
 
 @app.route('/search', methods=['POST'])
 def search():
+    meal = None
+    meals = []
     if request.method == 'POST':
         main_ingredient = request.form.get('main_ingredient')
         extra_ingredients = request.form.get('extra_ingredients').split(',')
@@ -237,8 +230,8 @@ def search():
                 db.session.add(recipe)
         db.session.commit()
 
-        return render_template('index.html', meals=meals)
-    return render_template('index.html')
+        return render_template('index.html', meals=meals, meal=meal)
+    return render_template('index.html', meals=meals, meal=meal)
 
 def add_favorite(user_id, recipe_id):
     """Add a recipe to a user's favorites."""
@@ -356,7 +349,7 @@ def users_show(user_id):
                 .query
                 .filter(Recipe.user_id == user_id)
                 .all())
-    form = RegistrationForm(obj=user)  # Create form with user data
+    form = RegistrationForm(obj=user)
     return render_template('users/show.html', user=user, recipes=recipes, form=form)
 
 @app.route('/users/profile', methods=["GET", "POST"])
