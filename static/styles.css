@@ -162,12 +162,14 @@ nav form.input-container input::placeholder {
     background-color: orange;
     color: black;
     border-radius: 15px;
+    border: 3px solid darkorange;
     padding: 20px;
     margin: 10px;
     text-align: center;
     width: 200px;
     transition: transform .2s; 
-    margin-top: 100px;
+    margin-top: 65px;
+    width: 400px;
 }
 
 .meal:hover {
@@ -177,7 +179,8 @@ nav form.input-container input::placeholder {
 .meal img {
     width: 100%;
     height: auto;
-    border-radius: 15px;
+    border-radius: 50%;
+    border: 2px solid darkorange;
 }
 
 .container {
