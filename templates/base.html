@@ -13,6 +13,11 @@
         <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
         <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/cookbook-favicon.png') }}">
+        <style>
+            #extra-ingredients_search {
+                display: none;
+            }   
+        </style>
     </head>
 </head>
 
@@ -28,7 +33,7 @@
         
         <form class="input-container" method="POST" action="{{ url_for('search') }}">
             <input type="text" name="main_ingredient" class="text input" placeholder="Main Ingredient">
-            <input type="text" name="extra_ingredients" class="text input"
+            <input type="text" name="extra_ingredients" class="text input" id="extra-ingredients_search"
                 placeholder="Extra Ingredients">
             <button type="submit"><i class="fas fa-search magnifier" id="magnifier"></i></button>
         </form>
