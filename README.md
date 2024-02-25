@@ -12,4 +12,4 @@ I am developing an app that uses [TheMealDB API](https://www.themealdb.com/) to 
 6. **Unit Tests:** Implement unit tests to ensure the functionality of key components, maintain code quality, and prevent regressions during development. This includes testing models, routes, and API integrations.
 
 ## Stretch Goals
-I plan to include features like a shopping list generator, recipe categories (spicy, savory, sweet), nutritional information, the ability to filter recipes by cooking time, and the option to add 2-3 additional ingredients for more specific recipe suggestions.
+I plan to include features like a shopping list generator, recipe categories (breakfast, lunch, and dinner), nutritional information, the ability to filter recipes by cooking time, and the option to add 2-3 additional ingredients for more specific recipe suggestions.
