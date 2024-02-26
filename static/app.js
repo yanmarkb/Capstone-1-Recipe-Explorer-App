@@ -70,3 +70,27 @@ Promise.all(
 		carouselImages[activeIndex].classList.add("active");
 	}, 3000);
 });
+
+document.querySelector(".dropdown-btn").addEventListener("click", function () {
+	var navLinks = document.querySelectorAll("nav a");
+	for (var i = 0; i < navLinks.length; i++) {
+		if (navLinks[i].style.display === "none") {
+			navLinks[i].style.display = "block";
+		} else {
+			navLinks[i].style.display = "none";
+		}
+	}
+});
+
+document
+	.querySelector(".footer-dropdown-btn")
+	.addEventListener("click", function () {
+		var footerLinks = document.querySelectorAll(".footer-content p");
+		for (var i = 0; i < footerLinks.length; i++) {
+			if (footerLinks[i].style.display === "none") {
+				footerLinks[i].style.display = "block";
+			} else {
+				footerLinks[i].style.display = "none";
+			}
+		}
+	});

@@ -39,6 +39,7 @@ nav {
     background-color: #16432E; 
     box-shadow: 10px 10px 10px 10px rgba(0, 0, 0, 0.5);
     border-top: 2px solid darkorange;
+    z-index: 2;
 }
 
 nav a {
@@ -544,45 +545,146 @@ ul.flashes li {
     background-color: darkorange; 
 }
 
-@media only screen and (max-width: 600px){
+.dropdown-btn {
+    display: none;
+}
+
+/* 
+@media only screen and (max-width: 600px) {
+    body {
+        font-size: 14px;
+    }
+
+    nav {
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        padding: 2px;
+        z-index: 2;
+        justify-content: center;
+        margin: 1px;
+        height: auto;
+        width: 105%;
+    }
+
+    nav a {
+        display: none;
+    }
+
+    .dropdown-btn {
+        position: relative;
+        display: block;
+        background-color: orange;
+        border: 2px solid darkorange;   
+        width: 101.5%;
+        border-radius: 5px;
+        top: 5px;
+    }
 
     .input-container {
         flex-direction: column;
+        padding: 10px;
         padding-right: 0;
     }
 
     nav form.input-container {
-        right: 0;
-    }
-
-    .centered-form input[type="text"], .centered-form input[type="password"] {
         width: 100%;
-    }
 
-    button[type="submit"] {
-        width: 100%;
-    }
-
-    nav a {
-        margin: 10px;
     }
 
     nav form.input-container input {
         width: 100%;
-        margin: 1px;
+
+    }
+
+    button[type="submit"] {
+        display: flex;
+        position: relative;
+        width: 102%;
+        height: 40px;
+        border-radius: 5px;
+        align-items: center;
+        justify-content: center;
+        right: 10px;
+        margin-top: 5px;
+    }
+
+    .centered-form {
+        height: auto;
+        padding: 10px;
     }
 
     .centered-button input[type="submit"] {
         width: 100%;
+        height: 40px;
+    }
+
+    .centered-form input[type="text"], .centered-form input[type="password"] {
+        width: 100%;
+        margin: 5px 0;
+    }
+
+    .welcome-message {
+        font-size: 16px;
+        width: 100%;
+        left: 4px;
+        margin-top: 20px;
+    }
+
+    .meal {
+        display: inline-block;
+        width: 15%;
+        margin-top: 30px;
+        padding: 10px;
+    }
+
+    .container {
+        flex-direction: column;
+    }
+
+    .meal-container {
+        flex-direction: row;
+        width: 100%;
+        height: 50%;
+        padding: 10px;
+        margin-top: 50px;
+        align-items: center; 
+    }
+
+    .meal-details { 
+        margin-left: 10px;
+    }
+
+    .meal-container img {
+        width: 100%;
+    }
+
+    .favorite-button {
+        top: 5px;
+        right: 5px;
+    }
+
+    .dropdown {
+        top: 20px;
+    }
+
+    .dropdown-content {
+        min-width: 100px;
+        padding: 6px 8px;
     }
 
     .dropbtn {
-        padding: 10px; 
-        font-size: 14px; 
+        padding: 8px;
+        right: 4px;
+        font-size: 14px;
     }
 
-    .favorite-button button {
-        padding: 5px; 
+    .dropbtn:after {
+        font-size: 8px;
+        padding-left: 3px;
     }
 
     #favorite-icon {
@@ -590,60 +692,106 @@ ul.flashes li {
     }
 
     .fixed-meal-name {
-        left: 10%;
+        left: 17%; 
     }
 
-    .favorites-container, .profile-container {
+    .favorites-container {
+        padding: 10px;
+        width: 90%;
+        height: 200px;
+        margin-top: 25px;
+    }
+
+    .favorites-name {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .profile-container {
         width: 90%;
         padding: 10px;
-        list-style-type: none;
+        margin-top: 50px;
     }
 
     .message-area {
-        flex-direction: column; 
-        align-items: flex-start; 
+        flex-direction: column;
     }
 
     #profile-icon {
-        margin-right: 0; 
-        margin-bottom: 10px; 
+        width: 50%;
+        height: 50%;
+        margin-right: 0;
+        top: 0;
+        transform: translateY(0);
     }
 
     .user-info {
-        align-items: center; 
-    }
-
-    .profile-button {
-        font-size: 14px; 
+        align-items: center;
     }
 
     .profile-dropdown {
-        top: 30px; 
+        top: 20px;
     }
 
     .profile-dropdown-content {
-        padding: 10px 14px; 
+        min-width: 100px;
+        padding: 6px 8px;
     }
 
     .profile-dropbtn {
-        padding: 14px; 
-        font-size: 14px; 
+        padding: 8px;
+        right: 4px;
+        font-size: 14px;
     }
 
     .profile-dropbtn:after {
-        font-size: 8px; 
-        padding-left: 3px; 
+        font-size: 8px;
+        padding-left: 3px;
     }
 
     #edit-button {
         width: 100%;
-        padding: 5px; 
-        margin: 5px 0;  
+        margin: 5px 0;
+    }
+
+    .edit-btn-area .btn {
+        margin-bottom: 5px;
     }
 
     .join-message {
-        font-size: 16px; 
-        margin-top: 30px; 
+        margin-top: 25px;
+        font-size: 16px;
+        bottom: 15px;
     }
-}
 
+    ul.flashes li {
+        padding: 5px;
+        margin-bottom: 5px;
+    }
+
+    .carousel {
+        width: 100%;
+        height: 150px;
+        left: 0;
+        margin-top: 25px;
+    }
+
+    .carousel-image {
+        width: 50%;
+        height: 100%;
+    }
+
+    .carousel-image-1,
+    .carousel-image-2,
+    .carousel-image-3 {
+        animation-duration: 9s;
+    }
+
+    .random-meal-button {
+        padding: 8px 16px;
+        bottom: 28em;
+        right: 0;
+    }
+
+    
+} */
