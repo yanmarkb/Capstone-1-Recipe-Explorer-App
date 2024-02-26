@@ -33,6 +33,8 @@
                 <img class="carousel-image carousel-image-2" src="{{ meal.strMealThumb }}" alt="Meal Image">
                 <img class="carousel-image carousel-image-3" src="{{ meal.strMealThumb }}" alt="Meal Image">
             </div>
+            
+            <a href="{{ url_for('random_meal') }}" class="random-meal-button">Random Meal</a>
         {% endif %}
     </div>
 </main>

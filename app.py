@@ -156,6 +156,18 @@ def meal(id):
 
     return render_template('meal.html', meal=meal, is_favorited=is_favorited)
 
+@app.route('/random_meal')
+@login_required
+def random_meal():
+    response = requests.get('https://www.themealdb.com/api/json/v1/1/random.php')
+    meal = response.json()['meals'][0]
+    meal['id'] = meal['idMeal']
+
+    # Check if the meal is favorited by the current user
+    is_favorited = Favorite.query.filter_by(user_id=g.user.id, recipe_id=meal['id']).first() is not None
+
+    return render_template('meal.html', meal=meal, is_favorited=is_favorited)
+
 def search_meals(main_ingredient, extra_ingredients):
     # Send requests to the APIs
     filter_url = f"https://www.themealdb.com/api/json/v1/1/filter.php?i={main_ingredient}"
