@@ -19,7 +19,7 @@ CURR_USER_KEY = "curr_user"
 app = Flask(__name__)
 
 
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://localhost:5432/TheMealDB"
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgres://sjyauoso:wgA7E9ZgpoldxIDgywB-E4flrKmPXPS5@stampy.db.elephantsql.com/sjyauoso"
 app.config['SECRET_KEY'] = "it's a secret"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
