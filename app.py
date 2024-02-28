@@ -19,7 +19,7 @@ CURR_USER_KEY = "curr_user"
 app = Flask(__name__)
 
 
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql:///TheMealDB"
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:02012023@localhost:5432/TheMealDB"
 app.config['SECRET_KEY'] = "it's a secret"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
