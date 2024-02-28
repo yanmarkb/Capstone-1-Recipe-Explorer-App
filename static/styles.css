@@ -108,7 +108,7 @@ nav form.input-container input::placeholder {
     align-items: center;
     justify-content: center;
     bottom: 50px;
-    height: 60vh;
+    height: 80vh;
 }
 
 .centered-button {
