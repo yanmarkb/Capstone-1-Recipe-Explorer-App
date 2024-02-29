@@ -1,15 +1,22 @@
-# Recipe Explorer
+# [Recipe Explorer](https://capstone-1-recipe-explorer-app.onrender.com)
 
 ## Overview
-I am developing an app that uses [TheMealDB API](https://www.themealdb.com/) to suggest three recipes based on a chosen main ingredient. The goal is to help people who seek variety in their meals.
+Recipe Explorer is a cookbook app that allows users to input an ingredient and receive three meal suggestions. It even includes a random meal option for those who can't decide what to cook. The goal is to help people who seek variety in their meals and want to spice up their dinner time.
 
 ## Key Features
-1. **Main Ingredient:** Focus on a single main ingredient for unique recipe suggestions.
-2. **API Integration:** Utilize [TheMealDB API](https://www.themealdb.com/) to gather recipes.
-3. **Database Schema:** Develop a database for recipes, ingredients, instructions, and user preferences.
-4. **Security Measures:** Implement Bcrypt for password encryption and use salts for security.
-5. **CRUD:** Implement CRUD by adding items to lists (Create), view items in a list (Read), change items in a list (Update), and delete items from a list (Delete).
-6. **Unit Tests:** Implement unit tests to ensure the functionality of key components, maintain code quality, and prevent regressions during development. This includes testing models, routes, and API integrations.
+1. **Meal Search:** Users can search for meals based on a main ingredient.
+2. **Random Meal Suggestions:** Three random meals are suggested to the user to provide variety.
+3. **User Profile:** Users can create and edit their profiles.
+4. **Favorite Meals:** Users can save their favorite/"unfavorite" meals for future reference.
+5. **API Integration:** The app utilizes [TheMealDB API](https://www.themealdb.com/) to gather recipes.
 
-## Stretch Goals
-I plan to include features like a shopping list generator, recipe categories (breakfast, lunch, and dinner), nutritional information, the ability to filter recipes by cooking time, and the option to add 2-3 additional ingredients for more specific recipe suggestions.
+## User Flow
+1. A user creates an account.
+2. They can search for meals and have the option of saving them for future reference.
+3. The user can edit their profile once it is created through the navbar at the top.
+
+## Technology Stack
+The tech stack used for this project includes Python, Flask, SQLAlchemy, JavaScript, and HTML/CSS.
+
+## Additional Notes
+This project is a part of my capstone project. It is designed to showcase my skills in full-stack web development, particularly in Python, Flask, and SQLAlchemy. I chose to implement these features to provide a useful tool for meal planning and to demonstrate my ability to integrate with APIs.
